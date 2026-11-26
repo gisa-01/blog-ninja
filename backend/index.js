@@ -1,16 +1,37 @@
 import express from 'express';
+import dotenv from 'dotenv';
 import postRoutes from './routes/postRoutes.js';
-const app = express();
-const PORT = 5000;
+import connectDB from './config/database.js';
 
-//register routes
+// Load environment variables
+dotenv.config();
+
+// Initialize express
+const app = express();
+
+// Define port
+const PORT = process.env.PORT || 5000;
+
+// Register routes
 app.use('/api/posts', postRoutes);
 
-// default routes
+// Default route
 app.get('/', (req, res) => {
-  res.send('Welcome to Blog Ninja API');
+  res.send('Welcome to Blog Ninja API!');
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port: ${PORT}`);
-});
+// Connect to database, then start server
+const startServer = async () => {
+  try {
+    await connectDB();
+
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error('Server failed to start:', error.message);
+    process.exit(1);
+  }
+};
+
+startServer();
